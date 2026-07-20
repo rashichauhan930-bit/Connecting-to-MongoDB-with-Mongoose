@@ -1,0 +1,26 @@
+
+// GET /api/users — Get all users
+ 
+router.get("/", async (req, res) => {
+    try {
+        // Find all users in the database
+        const users = await User.find();
+ 
+        res.status(200).json({
+            message: "Users fetched successfully",
+            count: users.length,
+            users: users
+        });
+ 
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to fetch users",
+            error: error.message
+        });
+    }
+});
+ 
+/* Test:
+   GET http://localhost:5000/api/users
+*/
+    

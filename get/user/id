@@ -1,0 +1,109 @@
+// GET /api/users/:id — Get one user by ID
+ 
+router.get("/:id", async (req, res) => {
+    try {
+        // Find user by MongoDB _id
+        const user = await User.findById(req.params.id);
+ 
+        // If no user found with that ID
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+ 
+        res.status(200).json({
+            message: "User fetched successfully",
+            user: user
+        });
+ 
+    } catch (error) {
+        // If the ID format is invalid mongoose throws a CastError
+        res.status(400).json({
+            message: "Invalid user ID",
+            error: error.message
+        });
+    }
+});
+ 
+/* Test:
+   GET http://localhost:5000/api/users/64abc123def456789
+   Replace the ID with an actual _id from your database
+*/
+    
+// PUT /api/users/:id — Update a user completely
+// PATCH /api/users/:id — Update a user partially
+ 
+// Most APIs use PUT for full update and PATCH for partial update
+// In practice PATCH is more commonly used because you only send
+// the fields you want to change
+ 
+router.patch("/:id", async (req, res) => {
+    try {
+        // findByIdAndUpdate — find by ID and update in one step
+        const user = await User.findByIdAndUpdate(
+            req.params.id,    // which document to update
+            req.body,         // what to update it with
+            {
+                new: true,        // return the UPDATED document, not the old one
+                runValidators: true  // run schema validation on the new data
+            }
+        );
+ 
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+ 
+        res.status(200).json({
+            message: "User updated successfully",
+            user: user
+        });
+ 
+    } catch (error) {
+        res.status(400).json({
+            message: "Failed to update user",
+            error: error.message
+        });
+    }
+});
+ 
+/* Test:
+   PATCH http://localhost:5000/api/users/64abc123def456789
+   Body (JSON):
+   {
+       "age": 22
+   }
+   Only the age will change — name and email stay the same
+*/
+    // DELETE /api/users/:id — Delete a user
+ 
+router.delete("/:id", async (req, res) => {
+    try {
+        // findByIdAndDelete — find by ID and remove in one step
+        const user = await User.findByIdAndDelete(req.params.id);
+ 
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+ 
+        res.status(200).json({
+            message: "User deleted successfully",
+            deletedUser: user
+        });
+ 
+    } catch (error) {
+        res.status(400).json({
+            message: "Failed to delete user",
+            error: error.message
+        });
+    }
+});
+ 
+/* Test:
+   DELETE http://localhost:5000/api/users/64abc123def456789
+*/
+    
